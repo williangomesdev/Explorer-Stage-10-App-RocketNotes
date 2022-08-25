@@ -37,12 +37,12 @@ class NotesController {
 
   //mostrar notas em tela
   async show(request, response) {
-    const { id } = request.params;
+    const user_id  = request.user.id;
 
-    const note = await knex("notes").where({ id }).first();
-    const tags = await knex("tags").where({ note_id: id }).orderBy("name");
+    const note = await knex("notes").where({ user_id  }).first();
+    const tags = await knex("tags").where({ note_id: user_id  }).orderBy("name");
     const links = await knex("links")
-      .where({ note_id: id })
+      .where({ note_id: user_id  })
       .orderBy("created_at");
 
     return response.json({
@@ -54,9 +54,9 @@ class NotesController {
 
   //Deletar notas
   async delete(request, response) {
-    const { id } = request.params;
+    const user_id = request.user.id;
 
-    await knex("notes").where({ id }).delete();
+    await knex("notes").where({ user_id }).delete();
 
     return response.json();
   }
