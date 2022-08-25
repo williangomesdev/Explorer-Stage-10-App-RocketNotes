@@ -16,12 +16,12 @@ class UsersController {
   update = PUT atualizar um registro
   delete - DELETE para remover um registro
   */
- 
- //Criação
- 
- async create(request, response) {
-   const { name, email, password } = request.body;
-   const passwordEncryption = hash(password, 8);
+
+  //Criação
+
+  async create(request, response) {
+    const { name, email, password } = request.body;
+    const passwordEncryption = hash(password, 8);
     const database = await sqliteConnection();
     const checkUserExists = await database.get(
       "SELECT * FROM users WHERE email = (?)",
@@ -47,10 +47,10 @@ class UsersController {
 
   async update(request, response) {
     const { name, email, password, old_password } = request.body;
-    const passwordEncryption = hash(password, 8);
-    const { id } = request.params;
+
+    const user_id= request.user.id;
     const database = await sqliteConnection();
-    const user = await database.get("SELECT * FROM users WHERE id = (?)", [id]);
+    const user = await database.get("SELECT * FROM users WHERE id = (?)", [user_id]);
 
     //se usuário não existir
     if (!user) {
@@ -84,11 +84,11 @@ class UsersController {
         throw new AppError("A senha antiga não confere");
       }
 
-      user.password = await passwordEncryption;
+      user.password = hash(password, 8);
     }
     await database.run(
       `UPDATE users SET name = ?, email = ?,password =?, updated_at = DATETIME('now') WHERE id =?`,
-      [user.name, user.email, user.password, id]
+      [user.name, user.email, user.password, user_id]
     );
 
     return response.json();
