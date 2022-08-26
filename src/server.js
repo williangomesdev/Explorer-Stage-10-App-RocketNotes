@@ -5,6 +5,9 @@ const uploadConfig = require("./configs/upload");
 
 const express = require("express");
 
+//Importando cors integração do back-end com o front-end
+const cors = require("cors");
+
 //Importar rotas
 const routes = require("./routes");
 
@@ -12,6 +15,10 @@ const routes = require("./routes");
 migrationsRun();
 
 const app = express();
+
+//integração do back-end com o front-end
+app.use(cors());
+
 //Informar qual o formato que o servidor enviará os dados
 app.use(express.json());
 
