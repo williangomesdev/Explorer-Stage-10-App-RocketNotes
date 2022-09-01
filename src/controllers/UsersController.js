@@ -21,7 +21,7 @@ class UsersController {
 
   async create(request, response) {
     const { name, email, password } = request.body;
-    const passwordEncryption = hash(password, 8);
+  
     const database = await sqliteConnection();
     const checkUserExists = await database.get(
       "SELECT * FROM users WHERE email = (?)",
@@ -34,7 +34,7 @@ class UsersController {
     }
 
     //Criptografia password
-    const hashedPassword = await passwordEncryption;
+    const hashedPassword = await hash(password, 8);
 
     //Inserir dados
     await database.run(
@@ -80,11 +80,12 @@ class UsersController {
 
     if (password && old_password) {
       const checkOldPassword = await compare(old_password, user.password);
+
       if (!checkOldPassword) {
         throw new AppError("A senha antiga não confere");
       }
 
-      user.password = hash(password, 8);
+      user.password = await hash(password, 8);
     }
     await database.run(
       `UPDATE users SET name = ?, email = ?,password =?, updated_at = DATETIME('now') WHERE id =?`,
