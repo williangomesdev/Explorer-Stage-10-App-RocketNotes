@@ -5,7 +5,7 @@ const notesRoutes = require("../routes/notes.routes");
 class NotesController {
   async create(request, response) {
     const { title, description, tags, links } = request.body;
-    const user_id  = request.user.id;
+    const user_id = request.user.id;
 
     const note_id = await knex("notes").insert({
       title,
@@ -37,12 +37,12 @@ class NotesController {
 
   //mostrar notas em tela
   async show(request, response) {
-    const user_id  = request.user.id;
+    const user_id = request.user.id;
 
-    const note = await knex("notes").where({ user_id  }).first();
-    const tags = await knex("tags").where({ note_id: user_id  }).orderBy("name");
+    const note = await knex("notes").where({ user_id }).first();
+    const tags = await knex("tags").where({ note_id: user_id }).orderBy("name");
     const links = await knex("links")
-      .where({ note_id: user_id  })
+      .where({ note_id: user_id })
       .orderBy("created_at");
 
     return response.json({
@@ -64,7 +64,7 @@ class NotesController {
   //Listagem de notas
   async index(request, response) {
     const { title, tags } = request.query;
-    const user_id  = request.user.id;
+    const user_id = request.user.id;
 
     let notes;
 
@@ -77,6 +77,7 @@ class NotesController {
         .whereLike("notes.title", `%${title}%`)
         .whereIn("name", filterTags)
         .innerJoin("notes", "notes.id", "tags.note_id")
+        .groupBy("notes.id")
         .orderBy("notes.title");
     } else {
       notes = await knex("notes")
